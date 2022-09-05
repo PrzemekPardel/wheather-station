@@ -9,7 +9,7 @@
  *    --- AS3935_ADD3  0x03   A0 = 1  A1 = 1
  * @license     The MIT License (MIT)
  * @author przemyslaw.pardel@gmail.com
- * Oryginal code: @url https://github.com/DFRobor/DFRobot_AS3935
+ * Base code: @url https://github.com/DFRobor/DFRobot_AS3935
  */
 
 // Lightning Sensor Library
@@ -104,12 +104,22 @@ void loop() {
 }
 
 void startLightningMeasurements() {
-    // It does nothing until an interrupt is detected on the IRQ pin.
-  //while (AS3935IsrTrig == 0) {delay(1);}
-  if (AS3935IsrTrig == 0) {
-    Serial.println("No lightning occurs in 40km circle!");
-    return;
+  // Run option 1: It does nothing until an interrupt is detected on the IRQ pin.
+  // Run option 2:  This doeas interaction all the time and share the status
+  int runOption = 2;
+
+  if (runOption == 1) {
+    while (AS3935IsrTrig == 0) {
+      delay(1);
+    }
+  } else if (runOption == 2) {
+    if (AS3935IsrTrig == 0) {
+      Serial.println("No lightning occurs in 40km circle!");
+      return;
+    }
   }
+
+  // Small delay
   delay(5);
   
   // Reset interrupt flag
