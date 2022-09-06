@@ -14,6 +14,7 @@
 
 // Lightning Sensor Library
 #include "DFRobot_AS3935_I2C.h"
+#include <I2C.h> //https://github.com/rambo/I2C
 
 volatile int8_t AS3935IsrTrig = 0;
 
@@ -41,6 +42,12 @@ void setup()
 
 void setupLightningSensor() {
   Serial.println("DFRobot AS3935 lightning sensor begin!");
+  // Setup for the the I2C library: (enable pullups, set speed to 400kHz)
+  I2c.begin();
+  I2c.pullup(true);
+  I2c.setSpeed(1);
+  delay(2);
+  
   Serial.println("Setting up address");
   lightning0.setI2CAddress(AS3935_ADD3);
 
@@ -106,7 +113,7 @@ void loop() {
 void startLightningMeasurements() {
   // Run option 1: It does nothing until an interrupt is detected on the IRQ pin.
   // Run option 2:  This doeas interaction all the time and share the status
-  int runOption = 2;
+  int runOption = 1;
 
   if (runOption == 1) {
     while (AS3935IsrTrig == 0) {
@@ -127,7 +134,7 @@ void startLightningMeasurements() {
   
   // Get interrupt source
   uint8_t intSrc = lightning0.getInterruptSrc();
-  if (intSrc == 1){
+  if (intSrc == 1) {
     // Get rid of non-distance data
     uint8_t lightningDistKm = lightning0.getLightningDistKm();
     Serial.println("Lightning occurs!");
@@ -140,9 +147,9 @@ void startLightningMeasurements() {
     Serial.print("Intensity: ");
     Serial.print(lightningEnergyVal);
     Serial.println("");
-  }else if (intSrc == 2){
+  } else if (intSrc == 2) {
     Serial.println("Disturber discovered!");
-  }else if (intSrc == 3){
+  } else if (intSrc == 3) {
     Serial.println("Noise level too high!");
   } else {
     Serial.println("Noise level too low!");
